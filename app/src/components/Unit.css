@@ -1,0 +1,13 @@
+.unit {
+  /* background-color: aquamarine; */
+  text-align: center;
+  padding: auto;
+  font-size: 2rem;
+  border: none;
+  width: 3rem;
+  height: 3rem;
+  caret-color: transparent;
+  opacity: .7;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
