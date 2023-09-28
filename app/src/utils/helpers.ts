@@ -8,12 +8,19 @@ export interface IndexInterface {
   box: Pos[][];
 }
 
+const sleep = (ms) => {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 export const solveBoard = async (
   board: Board,
   updateBoard: (board: Board) => Promise<void>,
-  indexes: IndexInterface
+  indexes: IndexInterface,
+  speed: number,
 ) => {
   const solveBd = async (board: Board): Promise<boolean> => {
+    console.log(speed, ((speed - 1) / 4) * 25)
+    await sleep(((5 - speed) / 4) * 100);
     await updateBoard(board);
 
     // Board is solved

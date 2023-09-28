@@ -11,7 +11,7 @@ export enum UnitState {
 }
 
 const errorColor = '#e66372';
-const errorBgColor = '#f6ced6'; 
+const errorBgColor = '#f6ced6';
 const normalColor = '#344861';
 const normalBgColor = 'white';
 const coActiveBgColor = '#E5EBFF';

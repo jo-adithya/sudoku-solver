@@ -1,5 +1,5 @@
-import React, { createContext, useRef } from 'react';
-import { Pos } from '../models/Pos';
+import React, { createContext, useRef } from "react";
+import { Pos } from "../models/Pos";
 import {
   Board,
   create2DArray,
@@ -7,19 +7,19 @@ import {
   solveBoard,
   getIndexes,
   IndexInterface,
-} from '../utils/helpers';
-import { UnitState } from '../utils/unitStyle';
+} from "../utils/helpers";
+import { UnitState } from "../utils/unitStyle";
 
 interface BoardContextInterface {
   size: number;
   board: Board;
   refs: any; // TODO: remove any
   activeUnit: Pos | null;
-  setActiveUnit: (pos: Pos) => void;
-  setUnitValue: (value: number | '', unit: Pos) => void;
-  findErrors: (value: number | '', pos: Pos) => Pos[];
+  setActiveUnit: (pos: Pos | null) => void;
+  setUnitValue: (value: number | "", unit: Pos) => void;
+  findErrors: (value: number | "", pos: Pos) => Pos[];
   removeErrors: (errors: Pos[], pos: Pos) => void;
-  solve: () => Promise<boolean>;
+  solve: (speed: number) => Promise<boolean>;
 }
 
 export const BoardContext = createContext<BoardContextInterface | undefined>(
@@ -28,12 +28,12 @@ export const BoardContext = createContext<BoardContextInterface | undefined>(
 
 export const BoardProvider = ({ children }: { children: React.ReactNode }) => {
   const size = 3;
-  const board = useRef<Board>(create2DArray<''>(size * size, ''));
+  const board = useRef<Board>(create2DArray<"">(size * size, ""));
   const refs = useRef(create2DArray<any>(size * size, null));
   const activeUnit = useRef<Pos | null>(null);
   const indexes = createIndexes(size * size);
 
-  const handleUnitInput = (value: number | '', unit: Pos) => {
+  const handleUnitInput = (value: number | "", unit: Pos) => {
     board.current[unit.i][unit.j] = value;
     refs.current[unit.i][unit.j].changeUnitValue(value);
   };
@@ -72,23 +72,20 @@ export const BoardProvider = ({ children }: { children: React.ReactNode }) => {
     refs.current[pos.i][pos.j].setState(UnitState.Active, UnitState.CoActive);
   };
 
-  const findErrors = (
-    val: number | '',
-    pos: Pos
-  ): Pos[] => {
-    if (val === '') return [];
+  const findErrors = (val: number | "", pos: Pos): Pos[] => {
+    if (val === "") return [];
 
     const length = indexes.col.length;
     const { row, col, box } = getIndexes(indexes, pos);
     let errors: Pos[] = [];
-  
+
     const addError = (errors: Pos[], pos: Pos) => {
       for (let i = 0, n = errors.length; i < n; i++) {
         if (+errors[i] === +pos) return;
       }
       errors.push(pos);
     };
-  
+
     for (let i = 0; i < length; i++) {
       if (+row[i] !== +pos && board.current[row[i].i][row[i].j] === val) {
         addError(errors, row[i]);
@@ -103,14 +100,14 @@ export const BoardProvider = ({ children }: { children: React.ReactNode }) => {
         refs.current[box[i].i][box[i].j].addError(pos);
       }
     }
-  
+
     return errors;
   };
 
   const removeErrors = (errors: Pos[], pos: Pos) => {
     for (let i = 0, n = errors.length; i < n; i++)
       refs.current[errors[i].i][errors[i].j].removeError(pos);
-  }
+  };
 
   const contextValue = {
     size: size,
@@ -121,7 +118,7 @@ export const BoardProvider = ({ children }: { children: React.ReactNode }) => {
     setUnitValue: handleUnitInput,
     findErrors: findErrors,
     removeErrors: removeErrors,
-    solve: () => solveBoard(board.current, updateBoard, indexes),
+    solve: (speed) => solveBoard(board.current, updateBoard, indexes, speed),
   };
 
   return (
